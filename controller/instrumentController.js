@@ -1,5 +1,5 @@
 exports.getIndex = (req, res) => {
-  res.render('layout/base', {body: 'test'});
+  res.render('index', {body: 'test'});
 };
 
 exports.getInstrumentCreateForm = (req, res) => {
