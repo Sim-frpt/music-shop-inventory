@@ -16,7 +16,6 @@ exports.getIndex = (req, res, next) => {
       res.render('index', data);
     })
     .catch(err => next(err))
-    //.then(db.client.end());
 };
 
 exports.getInstrumentCreateForm = (req, res) => {

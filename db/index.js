@@ -1,4 +1,4 @@
-const { Client } = require('pg');
+const { Pool } = require('pg');
 
 //const connectionString = "postgresql://sim:simon@localhost:5432/music_shop_inventory";
 
@@ -10,17 +10,16 @@ const config = {
   port: process.env.DB_PORT
 };
 
-//const client = new Client(connectionString);
-const client = new Client(config);
+//const pool = new pool(connectionString);
+const pool = new Pool(config);
 
-client
+pool
   .connect()
   .then(() => console.log(`Connected to ${config.database} db`))
   .catch(err => console.error("connection error", err.stack));
 
 module.exports = {
   query: (text, params) => {
-    return client.query(text, params);
-  },
-  client: client
+    return pool.query(text, params);
+  }
 };
