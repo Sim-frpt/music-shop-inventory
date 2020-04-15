@@ -25,3 +25,7 @@ exports.postCategoryDeleteForm = (req, res) => {
 exports.getCategoryDetails = (req, res) => {
   res.send("Get details, not implemented yet");
 };
+
+exports.getCategoriesList = (req, res) => {
+  res.send("Get Categories list, not implemented yet");
+};

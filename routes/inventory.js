@@ -34,5 +34,6 @@ router.get('/category/:id/delete', categoryController.getCategoryDeleteForm);
 router.get('/category/:id/delete', categoryController.postCategoryDeleteForm);
 
 router.get('/category/:id/', categoryController.getCategoryDetails);
+router.get('/categories/', categoryController.getCategoriesList);
 
 module.exports = router;

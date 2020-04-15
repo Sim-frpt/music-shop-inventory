@@ -4,6 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const hbs = require('hbs');
+const hbsUtils = require('hbs-utils')(hbs);
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -19,13 +20,14 @@ app.set('view options', { layout: 'layout/base'});
 app.set('view engine', 'hbs');
 
 // Register hbs partials
-hbs.registerPartials(path.join(__dirname, '/views/partials'));
+hbsUtils.registerWatchedPartials(path.join(__dirname, '/views/partials'));
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'node_modules/@fortawesome/fontawesome-free/')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

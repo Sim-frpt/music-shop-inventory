@@ -21,5 +21,6 @@ client
 module.exports = {
   query: (text, params) => {
     return client.query(text, params);
-  }
+  },
+  client: client
 };

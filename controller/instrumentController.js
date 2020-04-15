@@ -1,5 +1,22 @@
-exports.getIndex = (req, res) => {
-  res.render('index', {body: 'test'});
+const db = require('../db/index');
+
+exports.getIndex = (req, res, next) => {
+  const data = {};
+  const categoryCount = db.query("SELECT COUNT(*) FROM category");
+  const instrumentCount = db.query("SELECT COUNT(*) FROM instrument");
+
+  data.title = "Instrument inventory homepage";
+
+  Promise.all([categoryCount, instrumentCount])
+    .then(results => {
+      data.categoryCount = results[0].rows[0];
+      data.instrumentCount = results[1].rows[0];
+
+      console.log(data);
+      res.render('index', data);
+    })
+    .catch(err => next(err))
+    //.then(db.client.end());
 };
 
 exports.getInstrumentCreateForm = (req, res) => {
