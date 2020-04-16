@@ -1,0 +1,28 @@
+<div class="jumbotron">
+  <h1 class="mb-5 text-center">{{title}}</h1>
+  {{# if instruments}}
+    <div class="card-columns">
+      {{#each instruments}}
+        <div class="card border-primary mb-3">
+          <div class="card-header">
+            <a href="/inventory/category/{{this.category_id}}">{{this.category}}</a>
+          </div>
+          <div class="card-body">
+            <h4 class="card-title">
+              <a href="/inventory/instrument/{{this.instrument_id}}">{{this.name}}</a>
+            </h4>
+            <p class="card-text">{{this.description}}</p>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                price: <span class="instrument-price">{{this.price}} $</span>
+              </li>
+              <li class="list-group-item">stock: {{this.stock}}</li>
+            </ul>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <p>No instruments to display</p>
+  {{/if}}
+</div>

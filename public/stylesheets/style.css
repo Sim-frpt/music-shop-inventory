@@ -14,3 +14,11 @@ a {
 .list-group {
   font-size: 1em;
 }
+
+.instrument-price {
+  color: #E99002;
+}
+
+.card-text {
+  white-space: pre-line;
+}

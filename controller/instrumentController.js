@@ -46,6 +46,17 @@ exports.getInstrumentDetails = (req, res) => {
   res.send("Get details, not implemented yet");
 };
 
-exports.getInstrumentsList = (req, res) => {
-  res.send("Get instruments list, not implemented yet");
+exports.getInstrumentsList = (req, res, next) => {
+  const query = {
+    text: "SELECT instrument_id, i.name, description, price, stock, c.name as category, c.category_id FROM instrument i LEFT JOIN category c ON i.category_id = c.category_id"
+  };
+
+  db.query(query)
+    .then(result => {
+      res.render("instruments", {
+        title: "Instruments List",
+        instruments: result.rows
+      });
+    })
+    .catch(err => next(err));
 };
