@@ -1,0 +1,11 @@
+<div class="jumbotron">
+  <h1 class="mb-5">{{title}}</h1>
+  <h2 class="text-primary mb-3">{{#capitalize}}{{categoryName}} category{{/capitalize}} </h2>
+  <ul class="list-group w-25">
+    {{#each instruments}}
+    <li class="list-group-item">
+      <a href="/inventory/instrument/{{this.instrument_id}}">{{ this.instrument }}</a>
+    </li>
+    {{/each}}
+  </ul>
+</div>
