@@ -15,10 +15,14 @@ a {
   font-size: 1em;
 }
 
-.instrument-price {
+.instrument-list-price {
   color: #E99002;
 }
 
-.card-text {
+.instrument-description {
   white-space: pre-line;
+}
+
+.instrument-detail {
+  font-size: 1em;
 }

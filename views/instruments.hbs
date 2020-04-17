@@ -11,13 +11,10 @@
             <h4 class="card-title">
               <a href="/inventory/instrument/{{this.instrument_id}}">{{this.name}}</a>
             </h4>
-            <p class="card-text">{{this.description}}</p>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item">
-                price: <span class="instrument-price">{{this.price}} $</span>
-              </li>
-              <li class="list-group-item">stock: {{this.stock}}</li>
-            </ul>
+            <p class="card-text instrument-description">
+              {{this.description}} <a href="/inventory/instrument/{{this.instrument_id}}">...Read more</a>
+            </p>
+            <p class="card-text instrument-list-price">{{this.price}} $</p>
           </div>
         </div>
       {{/each}}

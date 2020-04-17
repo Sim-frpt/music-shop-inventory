@@ -1,0 +1,21 @@
+<div class="jumbotron">
+  <div class="container">
+    <h1 class="mb-5 text-center">{{title}}</h1>
+    <h2 class="text-primary">{{instrument.name}}</h2>
+    <h3 class="mb-3">
+      <small class="text-muted">
+        <a href="inventory/categories/{{instrument.category_id}}">
+          {{instrument.category}}
+        </a>
+      </small>
+    </h3>
+    <p class="w-75 instrument-description">{{instrument.description}}</p>
+    <ul class="list-group list-unstyled">
+      <li class="mb-3">
+        <span class="instrument-detail badge badge-primary badge-pill">{{instrument.price}} $</span></li>
+      <li>
+        <span class="instrument-detail badge badge-info badge-pill">Stock: {{instrument.stock}}</span>
+      </li>
+    </ul>
+  </div>
+</div>

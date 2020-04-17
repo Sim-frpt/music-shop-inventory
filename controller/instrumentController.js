@@ -12,7 +12,6 @@ exports.getIndex = (req, res, next) => {
       data.categoryCount = results[0].rows[0];
       data.instrumentCount = results[1].rows[0];
 
-      console.log(data);
       res.render('index', data);
     })
     .catch(err => next(err))
@@ -42,17 +41,37 @@ exports.postInstrumentDeleteForm = (req, res) => {
   res.send("post delete form, not implemented yet");
 };
 
-exports.getInstrumentDetails = (req, res) => {
-  res.send("Get details, not implemented yet");
-};
-
-exports.getInstrumentsList = (req, res, next) => {
+exports.getInstrumentDetails = (req, res, next) => {
   const query = {
-    text: "SELECT instrument_id, i.name, description, price, stock, c.name as category, c.category_id FROM instrument i LEFT JOIN category c ON i.category_id = c.category_id"
+    text: "SELECT instrument_id, i.name, description, price, stock, c.name as category, c.category_id FROM instrument i LEFT JOIN category c ON i.category_id = c.category_id WHERE instrument_id = $1",
+    values: [ req.params.id ]
   };
 
   db.query(query)
     .then(result => {
+      if (!result.rows) {
+        const error = new Error("Instrument not found");
+        error.status = 404;
+
+        return next(error);
+      }
+
+      res.render("instrument-details", {
+        title: "Instrument Details",
+        instrument: result.rows[0]
+      });
+    })
+    .catch(err => next(err));
+};
+
+exports.getInstrumentsList = (req, res, next) => {
+  const query = {
+    text: "SELECT instrument_id, i.name, description, price, c.name as category, c.category_id FROM instrument i LEFT JOIN category c ON i.category_id = c.category_id"
+  };
+
+  db.query(query)
+    .then(result => {
+      result.rows.forEach( row => row.description = shortenDescription(row.description));
       res.render("instruments", {
         title: "Instruments List",
         instruments: result.rows
@@ -60,3 +79,20 @@ exports.getInstrumentsList = (req, res, next) => {
     })
     .catch(err => next(err));
 };
+
+function shortenDescription(desc) {
+  let desiredTextLength = 150;
+
+  // Only shorten if character exists
+  if (desc.charAt(desiredTextLength)) {
+
+    // Make sure we don't cut in the middle of a word
+    while(desc.charAt(desiredTextLength) !== ' ') {
+      desiredTextLength++;
+    }
+
+    return desc.substring(0, desiredTextLength);
+  }
+
+  return desc;
+}
