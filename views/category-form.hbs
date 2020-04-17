@@ -1,0 +1,18 @@
+<div class="container mt-5">
+  <h1 class="mb-5">{{title}}</h1>
+  <form class="mb-5" action="" method="POST">
+    <div class="form-group">
+      <label for="category-name">Name</label>
+      <input type="text" id="category-name" class="form-control w-25" name="name" value="{{catInput}}" required minlength="2" maxlength="50">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  {{#if errors}}
+    {{#each errors}}
+    <div class="alert alert-dismissible alert-danger w-25">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <span>{{this.msg}}</span>
+    </div>
+    {{/each}}
+  {{/if}}
+</div>

@@ -1,6 +1,6 @@
 <div class="jumbotron">
   <h1 class="text-center mb-5">{{title}}</h1>
-  <div class="container text-center col-3">
+  <div class="container text-center col-3 mb-5">
     {{#if categories}}
       <ul class="list-group">
       {{#each categories}}
@@ -12,5 +12,8 @@
     {{else}}
       <p>No categories to display</p>
     {{/if}}
+  </div>
+  <div class="container text-center w-25 mx-auto">
+    <a class="btn btn-primary" href="{{url}}/create">Create Category</a>
   </div>
 </div>
