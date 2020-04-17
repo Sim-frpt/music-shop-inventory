@@ -1,3 +1,5 @@
+const db = require('../db/index');
+
 exports.getCategoryCreateForm = (req, res) => {
   res.send("Get create form, not implemented yet");
 };
@@ -27,5 +29,14 @@ exports.getCategoryDetails = (req, res) => {
 };
 
 exports.getCategoriesList = (req, res) => {
-  res.send("Get Categories list, not implemented yet");
+  db.query("SELECT * FROM category ORDER BY name ASC")
+    .then( result => {
+      res.render('categories', {
+        title: "Categories List",
+        categories: result.rows
+      });
+    })
+    .catch(err => {
+      next(err);
+    });
 };

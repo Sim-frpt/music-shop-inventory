@@ -1,0 +1,16 @@
+<div class="jumbotron">
+  <h1 class="text-center mb-5">{{title}}</h1>
+  <div class="container text-center col-3">
+    {{#if categories}}
+      <ul class="list-group">
+      {{#each categories}}
+        <a href="/inventory/category/{{this.category_id}}" class="list-group-item list-group-item-action list-group-item-primary">
+          {{#capitalize}}{{this.name}}{{/capitalize}}
+        </a>
+      {{/each}}
+      </ul>
+    {{else}}
+      <p>No categories to display</p>
+    {{/if}}
+  </div>
+</div>
