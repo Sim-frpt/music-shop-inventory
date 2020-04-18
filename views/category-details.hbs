@@ -1,6 +1,9 @@
 <div class="jumbotron">
   <h1 class="mb-5">{{title}}</h1>
   <h2 class="text-primary mb-3">{{#capitalize}}{{category.name}} category{{/capitalize}} </h2>
+  <a class="btn btn-info mb-5" href="{{baseCategoryUrl}}/{{category.category_id}}/update">
+    Change Category Name
+  </a>
   {{#if instruments}}
     <ul class="list-group w-25">
       {{#each instruments}}
