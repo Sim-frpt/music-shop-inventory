@@ -1,5 +1,8 @@
+const { check, validationResult } = require('express-validator');
 const db = require('../db/index');
+const baseInstrumentUrl = '/inventory/instrument';
 
+// GET base route
 exports.getIndex = (req, res, next) => {
   const data = {};
   const categoryCount = db.query("SELECT COUNT(*) FROM category");
@@ -17,8 +20,21 @@ exports.getIndex = (req, res, next) => {
     .catch(err => next(err))
 };
 
-exports.getInstrumentCreateForm = (req, res) => {
-  res.send("Get create form, not implemented yet");
+// GET create form
+exports.getInstrumentCreateForm = (req, res, next) => {
+  const query = {
+    text: "SELECT * from category"
+  };
+
+  db.query(query)
+    .then( result => {
+      res.render("instrument-form", {
+        title: "Add instrument",
+        categories: result.rows,
+        baseInstrumentUrl
+      });
+    })
+    .catch(err => next(err));
 };
 
 exports.postInstrumentCreateForm = (req, res) => {
@@ -58,7 +74,8 @@ exports.getInstrumentDetails = (req, res, next) => {
 
       res.render("instrument-details", {
         title: "Instrument Details",
-        instrument: result.rows[0]
+        instrument: result.rows[0],
+        baseInstrumentUrl
       });
     })
     .catch(err => next(err));
@@ -74,7 +91,8 @@ exports.getInstrumentsList = (req, res, next) => {
       result.rows.forEach( row => row.description = shortenDescription(row.description));
       res.render("instruments", {
         title: "Instruments List",
-        instruments: result.rows
+        instruments: result.rows,
+        baseInstrumentUrl
       });
     })
     .catch(err => next(err));

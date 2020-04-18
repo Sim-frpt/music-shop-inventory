@@ -1,5 +1,8 @@
 <div class="jumbotron">
   <h1 class="mb-5 text-center">{{title}}</h1>
+  <div class="container mb-5 mx-auto text-center">
+    <a class="btn btn-info" href="{{baseInstrumentUrl}}/create">Add Instrument</a>
+  </div>
   {{#if instruments}}
     <div class="card-columns">
       {{#each instruments}}

@@ -4,7 +4,7 @@ const baseCategoryUrl = "/inventory/category";
 
 // GET create form
 exports.getCategoryCreateForm = (req, res) => {
-  res.render("category-form", { title: "Create Category" });
+  res.render("category-form", { title: "Add Category" });
 };
 
 // POST create form
