@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 // Require controller modules
- const instrumentController = require("../controller/instrumentController"); 
- const categoryController = require("../controller/categoryController"); 
+ const instrumentController = require("../controller/instrumentController");
+ const categoryController = require("../controller/categoryController");
 
 /* INSTRUMENT ROUTES */
 
@@ -17,7 +17,7 @@ router.get('/instrument/:id/update', instrumentController.getInstrumentUpdateFor
 router.post('/instrument/:id/update', instrumentController.postInstrumentUpdateForm);
 
 router.get('/instrument/:id/delete', instrumentController.getInstrumentDeleteForm);
-router.get('/instrument/:id/delete', instrumentController.postInstrumentDeleteForm);
+router.post('/instrument/:id/delete', instrumentController.postInstrumentDeleteForm);
 
 router.get('/instrument/:id/', instrumentController.getInstrumentDetails);
 router.get('/instruments', instrumentController.getInstrumentsList);
@@ -30,8 +30,7 @@ router.post('/category/create', categoryController.postCategoryCreateForm);
 router.get('/category/:id/update', categoryController.getCategoryUpdateForm);
 router.post('/category/:id/update', categoryController.postCategoryUpdateForm);
 
-router.get('/category/:id/delete', categoryController.getCategoryDeleteForm);
-router.get('/category/:id/delete', categoryController.postCategoryDeleteForm);
+router.post('/category/:id/delete', categoryController.postCategoryDeleteForm);
 
 router.get('/category/:id/', categoryController.getCategoryDetails);
 router.get('/categories/', categoryController.getCategoriesList);

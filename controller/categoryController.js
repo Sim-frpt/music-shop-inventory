@@ -101,7 +101,6 @@ exports.postCategoryUpdateForm = [
       });
     }
 
-    console.log('passed validation');
     const verifyNameQuery = {
       text: "SELECT * FROM category WHERE name = $1 AND category_id != $2",
       values: [ req.body.name, req.params.id ]
@@ -137,14 +136,30 @@ exports.postCategoryUpdateForm = [
   }
 ];
 
-// GET delete form
-exports.getCategoryDeleteForm = (req, res) => {
-  res.send("get delete form, not implemented yet");
-};
-
 // POST delete form
-exports.postCategoryDeleteForm = (req, res) => {
-  res.send("post delete form, not implemented yet");
+exports.postCategoryDeleteForm = (req, res, next) => {
+  const searchCatQuery = {
+    text: "SELECT * FROM category WHERE category_id = $1",
+    values: [ req.body.category_id ]
+  }
+
+  const deleteCatQuery = {
+    text: "DELETE FROM category WHERE category_id = $1",
+    values: [ req.body.category_id ]
+  };
+
+  db.query(searchCatQuery)
+    .then(result => {
+
+      if (!result.rows.length) {
+        return res.redirect('/inventory/categories');
+      }
+
+      db.query(deleteCatQuery)
+        .then(res.redirect('/inventory/categories'))
+        .catch(err => next(err));
+    })
+    .catch(err => next(err));
 };
 
 // GET category details
@@ -155,7 +170,7 @@ exports.getCategoryDetails = (req, res, next) => {
   };
 
   const instrumentsQuery = {
-    text: "SELECT instrument_id, name FROM instrument WHERE category_id = $1",
+    text: "SELECT instrument_id, name FROM instrument WHERE category_id = $1 ORDER BY name ASC",
     values: [ req.params. id ]
   };
 
@@ -175,6 +190,7 @@ exports.getCategoryDetails = (req, res, next) => {
         title: "Category Details",
         category,
         instruments,
+        firstTwoInstruments: instruments.slice(0, 2),
         baseCategoryUrl
       });
     })
