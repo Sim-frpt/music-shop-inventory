@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const validateInstrument = require('../helpers/validators/instrument');
 const db = require('../db/index');
 const baseInstrumentUrl = '/inventory/instrument';
+const shortenDescription = require('../helpers/helpers');
 
 // GET base route
 exports.getIndex = (req, res, next) => {
@@ -201,19 +202,3 @@ exports.getInstrumentsList = (req, res, next) => {
     .catch(err => next(err));
 };
 
-function shortenDescription(desc) {
-  let desiredTextLength = 150;
-
-  // Only shorten if character exists
-  if (desc.charAt(desiredTextLength)) {
-
-    // Make sure we don't cut in the middle of a word
-    while(desc.charAt(desiredTextLength) !== ' ') {
-      desiredTextLength++;
-    }
-
-    return desc.substring(0, desiredTextLength);
-  }
-
-  return desc;
-}
