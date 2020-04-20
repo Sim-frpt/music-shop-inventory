@@ -1,4 +1,5 @@
-const { check, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
+const validateInstrument = require('../helpers/validators/instrument');
 const db = require('../db/index');
 const baseInstrumentUrl = '/inventory/instrument';
 

@@ -11,7 +11,7 @@ const usersRouter = require('./routes/users');
 const inventoryRouter = require('./routes/inventory');
 
 require("./db/index");
-require("./helpers/hbs");
+require("./helpers/handlebars/hbs");
 
 const app = express();
 

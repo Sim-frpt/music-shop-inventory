@@ -1,22 +1,16 @@
-const { check, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
 const db = require('../db/index');
 const baseCategoryUrl = "/inventory/category";
+const validateCategory = require('../helpers/validators/category');
 
 // GET create form
 exports.getCategoryCreateForm = (req, res) => {
-  res.render("category-form", { title: "Add Category" });
+  res.render("category-form", { title: "Create Category" });
 };
 
 // POST create form
 exports.postCategoryCreateForm = [
-  check('name')
-    .isLength({ min:2, max: 50}).withMessage("Name must be between 2 and 50 characters")
-    .not().isEmpty().withMessage("Name must not be empty")
-    .trim()
-    .isAlpha().withMessage("Name must not contain numbers")
-    .escape()
-    .customSanitizer(value => value.toLowerCase())
-  ,
+  validateCategory(),
   (req, res, next) => {
     const errors = validationResult(req);
 
@@ -81,14 +75,7 @@ exports.getCategoryUpdateForm = (req, res, next) => {
 
 // POST update form
 exports.postCategoryUpdateForm = [
-  check('name')
-    .isLength({ min:2, max: 50}).withMessage("Name must be between 2 and 50 characters")
-    .not().isEmpty().withMessage("Name must not be empty")
-    .trim()
-    .isAlpha().withMessage("Name must not contain numbers")
-    .escape()
-    .customSanitizer(value => value.toLowerCase())
-  ,
+  validateCategory(),
   (req, res, next) => {
     const errors = validationResult(req);
 
