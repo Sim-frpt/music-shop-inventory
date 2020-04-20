@@ -24,7 +24,7 @@
         <select
           class="form-control"
           id="instrument-category"
-          name="category">
+          name="category_id">
           <option selected disabled hidden>Select a category</option>
 
           {{!-- Custom helper --}}
@@ -53,7 +53,8 @@
             id="instrument-stock"
             class="form-control"
             name="stock"
-            value= "{{instrument.stock}}"
+            value="{{instrument.stock}}"
+            placeholder="0"
             >
         </div>
           <button type="submit" class="btn btn-primary">Submit</button>

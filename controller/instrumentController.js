@@ -43,6 +43,7 @@ exports.postInstrumentCreateForm = [
   validateInstrument(),
   (req, res, next) => {
     const errors = validationResult(req);
+    const { name, description, category_id, price, stock } = req.body;
     const categoryQuery = {
       text: "SELECT * FROM category"
     };
@@ -53,9 +54,10 @@ exports.postInstrumentCreateForm = [
           const categories = result.rows;
 
           return res.render("instrument-form", {
-            title: "add instrument",
+            title: "Add instrument",
             instrument: req.body,
             baseInstrumentUrl,
+            categories,
             errors: errors.array({ onlyFirstError: true })
           });
         })
@@ -63,7 +65,7 @@ exports.postInstrumentCreateForm = [
     } else {
       const insertInstrument = {
         text: "INSERT INTO instrument(name, description, category_id, price, stock) VALUES ($1, $2, $3, $4, $5) RETURNING instrument_id",
-        values: [ name, description, category, price, stock ]
+        values: [ name, description, category_id, price, stock ]
       };
 
       db.query(insertInstrument)
@@ -74,7 +76,6 @@ exports.postInstrumentCreateForm = [
     }
 
   }
-
 ];
 
 // GET update form
@@ -111,9 +112,44 @@ exports.getInstrumentUpdateForm = (req, res, next) => {
 };
 
 // POST update form
-exports.postInstrumentUpdateForm = (req, res) => {
-  res.send("Post update form, not implemented yet");
-};
+exports.postInstrumentUpdateForm = [
+  validateInstrument(),
+  (req, res, next) => {
+
+    const errors = validationResult(req);
+    const { name, description, category_id, price, stock } = req.body;
+    const categoryQuery = {
+      text: "SELECT * FROM category"
+    };
+
+    if (!errors.isEmpty()) {
+      return db.query(categoryQuery)
+        .then(result => {
+          const categories = result.rows;
+
+          return res.render("instrument-form", {
+            title: "Update instrument",
+            instrument: req.body,
+            baseInstrumentUrl,
+            categories,
+            errors: errors.array({ onlyFirstError: true })
+          });
+        })
+        .catch(err => next(err));
+    }
+
+    const insertQuery = {
+      text: "UPDATE instrument SET name = $1, description = $2, category_id = $3, price = $4, stock = $5 WHERE instrument_id = $6 RETURNING instrument_id",
+      values: [ name, description, category_id, price, stock, req.params.id ]
+    };
+
+    db.query(insertQuery)
+      .then(result => {
+        res.redirect(`${baseInstrumentUrl}/${result.rows[0].instrument_id}`);
+      })
+      .catch(err => next(err));
+  }
+];
 
 exports.getInstrumentDeleteForm = (req, res) => {
   res.send("get delete form, not implemented yet");

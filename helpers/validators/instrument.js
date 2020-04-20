@@ -11,19 +11,19 @@ function validateInstrument() {
     .isLength({ max: 2000 }).withMessage("Description must be shorter than 2000 characters")
     .trim()
     .escape(),
-    check('category')
+    check('category_id')
     .not().isEmpty().withMessage("Select a category for the instrument")
     .isInt({ allow_leading_zeroes: false })
     .trim()
     .escape(),
     check('price')
-    .isNumeric()
     .not().isEmpty().withMessage("Price must not be empty")
+    .isNumeric().withMessage("Price must be a number")
     .trim()
     .escape(),
     check('stock')
-    .isInt()
-    .not().isEmpty()
+    .not().isEmpty().withMessage("Stock must not be empty")
+    .isInt().withMessage("Stock must be a whole number")
     .trim()
     .escape()
   ];
