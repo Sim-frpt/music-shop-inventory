@@ -38,10 +38,52 @@ exports.getInstrumentCreateForm = (req, res, next) => {
     .catch(err => next(err));
 };
 
-exports.postInstrumentCreateForm = (req, res) => {
-  res.send("Post create form , not implemented yet");
-};
+// POST create form
+exports.postInstrumentCreateForm = [
+  validateInstrument(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    const { name, description, category, price, stock } = req.body;
+    const categoryQuery = {
+      text: "SELECT * FROM category"
+    };
 
+    if (!errors.isEmpty()) {
+      db.query(categoryQuery)
+        .then(result => {
+          const categories = result.rows;
+
+          return res.render("instrument-form", {
+            title: "add instrument",
+            categories,
+            name,
+            description,
+            category,
+            price,
+            stock,
+            baseInstrumentUrl,
+            errors: errors.array({ onlyFirstError: true })
+          });
+        })
+        .catch(err => next(err));
+    } else {
+      const insertInstrument = {
+        text: "INSERT INTO instrument(name, description, category_id, price, stock) VALUES ($1, $2, $3, $4, $5) RETURNING instrument_id",
+        values: [ name, description, category, price, stock ]
+      };
+
+      db.query(insertInstrument)
+        .then(value => {
+          return res.redirect(baseInstrumentUrl + '/' + value.rows[0].instrument_id);
+        })
+        .catch(err => next(err));
+    }
+
+  }
+
+];
+
+// GET update form
 exports.getInstrumentUpdateForm = (req, res) => {
   res.send("Get update form, not implemented yet");
 };
