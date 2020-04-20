@@ -43,7 +43,6 @@ exports.postInstrumentCreateForm = [
   validateInstrument(),
   (req, res, next) => {
     const errors = validationResult(req);
-    const { name, description, category, price, stock } = req.body;
     const categoryQuery = {
       text: "SELECT * FROM category"
     };
@@ -55,12 +54,7 @@ exports.postInstrumentCreateForm = [
 
           return res.render("instrument-form", {
             title: "add instrument",
-            categories,
-            name,
-            description,
-            category,
-            price,
-            stock,
+            instrument: req.body,
             baseInstrumentUrl,
             errors: errors.array({ onlyFirstError: true })
           });
@@ -84,10 +78,39 @@ exports.postInstrumentCreateForm = [
 ];
 
 // GET update form
-exports.getInstrumentUpdateForm = (req, res) => {
-  res.send("Get update form, not implemented yet");
+exports.getInstrumentUpdateForm = (req, res, next) => {
+  const categoriesQuery = {
+    text: "SELECT * from category"
+  };
+
+  const instrumentQuery = {
+    text: "SELECT * from instrument WHERE instrument_id = $1",
+    values: [ req.params.id ]
+  };
+
+  Promise.all([ db.query(categoriesQuery), db.query(instrumentQuery) ])
+    .then(results => {
+      const categories = results[0].rows;
+      const instrument = results[1].rows;
+
+      if (!instrument.length) {
+        const error = new Error("Instrument not found");
+        error.status = 404;
+
+        return next(error);
+      }
+
+      res.render("instrument-form", {
+        title: "Update Instrument",
+        instrument: instrument[0],
+        categories,
+        baseInstrumentUrl
+      });
+    })
+    .catch(err => next(err));
 };
 
+// POST update form
 exports.postInstrumentUpdateForm = (req, res) => {
   res.send("Post update form, not implemented yet");
 };
@@ -100,6 +123,7 @@ exports.postInstrumentDeleteForm = (req, res) => {
   res.send("post delete form, not implemented yet");
 };
 
+// GET instrument details
 exports.getInstrumentDetails = (req, res, next) => {
   const query = {
     text: "SELECT instrument_id, i.name, description, price, stock, c.name as category, c.category_id FROM instrument i LEFT JOIN category c ON i.category_id = c.category_id WHERE instrument_id = $1",

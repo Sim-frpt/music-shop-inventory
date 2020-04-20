@@ -1,7 +1,13 @@
 <div class="jumbotron">
   <div class="container">
-    <h1 class="mb-5 text-center">{{title}}</h1>
-    <h2 class="text-primary">{{instrument.name}}</h2>
+    <h1 class="mb-5">{{title}}</h1>
+    <h2 class="text-primary mb-3">{{instrument.name}}</h2>
+    <div class="mb-4">
+      <a class="btn btn-info mr-3" href="{{baseInstrumentUrl}}/{{instrument.instrument_id}}/update">Edit Instrument</a>
+      <button class="btn btn-info" data-toggle="modal" data-target="#delete-inst-modal">
+        Delete Instrument
+      </button>
+    </div>
     <h3 class="mb-3">
       <small class="text-muted">
         <a href="inventory/categories/{{instrument.category_id}}">
@@ -17,5 +23,47 @@
         <span class="instrument-detail badge badge-info badge-pill">Stock: {{instrument.stock}}</span>
       </li>
     </ul>
+  </div>
+</div>
+
+{{!-- Delete modal --}}
+<div class="modal fade" id="delete-inst-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">
+          {{!-- {{#capitalize}} delete {{category.name}} category {{/capitalize}} --}}
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {{#if instruments}}
+          <div class="alert alert-warning">
+            <h6 class="alert-header">Are you sure ? All related instruments will be deleted as well</h6>
+          </div>
+
+          <h6>Including For example:</h6>
+
+          <ul class="list-group list-group-flush">
+            {{#each firstTwoInstruments}}
+              <a class="list-group-item" href="/inventory/instrument/{{this.instrument_id}}">{{ this.name }}</a>
+            {{/each}}
+          </ul>
+        {{else}}
+          <h6>Please confirm you want to delete this category</h6>
+        {{/if}}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <form
+          method="POST"
+          action="{{baseCategoryUrl}}/{{category.category_id}}/delete">
+          <input type="hidden" class="form-control" name="category_id" value="{{category.category_id}}" required>
+          <button type="submit" class="btn btn-primary">Delete</button>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
