@@ -152,12 +152,33 @@ exports.postInstrumentUpdateForm = [
   }
 ];
 
-exports.getInstrumentDeleteForm = (req, res) => {
-  res.send("get delete form, not implemented yet");
-};
+// POST instrument delete
+exports.postInstrumentDeleteForm = (req, res, next) => {
+  const findInstQuery = {
+    text: "SELECT * FROM instrument WHERE instrument_id = $1",
+    values: [ req.body.instrument_id ]
+  }
 
-exports.postInstrumentDeleteForm = (req, res) => {
-  res.send("post delete form, not implemented yet");
+  const deleteInstQuery = {
+    text: "DELETE FROM instrument WHERE instrument_id = $1",
+    values: [ req.body.instrument_id ]
+  }
+
+  db.query(findInstQuery)
+    .then(result => {
+
+      if (!result.rows.length) {
+        const error = new Error("Instrument not found");
+        error.status = 404;
+
+        return next(error);
+      }
+
+      db.query(deleteInstQuery)
+        .then(res.redirect("/inventory/instruments"))
+        .catch(err => next(err));
+    })
+    .catch(err => next(err));
 };
 
 // GET instrument details
@@ -185,6 +206,7 @@ exports.getInstrumentDetails = (req, res, next) => {
     .catch(err => next(err));
 };
 
+// GET instrument list
 exports.getInstrumentsList = (req, res, next) => {
   const query = {
     text: "SELECT instrument_id, i.name, description, price, c.name as category, c.category_id FROM instrument i LEFT JOIN category c ON i.category_id = c.category_id"

@@ -29,7 +29,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">
+        <h5 class="modal-title text-primary" id="exampleModalLabel">
           {{#capitalize}} delete {{category.name}} category {{/capitalize}}
         </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -38,13 +38,11 @@
       </div>
       <div class="modal-body">
         {{#if instruments}}
-          <div class="alert alert-warning">
-            <h6 class="alert-header">Are you sure ? All related instruments will be deleted as well</h6>
+          <div class="text-warning mb-3">
+            <p><strong>Are you sure ? All related instruments will be deleted as well, including for example:</strong></p>
           </div>
 
-          <h6>Including For example:</h6>
-
-          <ul class="list-group list-group-flush">
+          <ul class="list-group">
             {{#each firstTwoInstruments}}
               <a class="list-group-item" href="/inventory/instrument/{{this.instrument_id}}">{{ this.name }}</a>
             {{/each}}

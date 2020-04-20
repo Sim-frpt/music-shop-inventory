@@ -16,7 +16,6 @@ router.post('/instrument/create', instrumentController.postInstrumentCreateForm)
 router.get('/instrument/:id/update', instrumentController.getInstrumentUpdateForm);
 router.post('/instrument/:id/update', instrumentController.postInstrumentUpdateForm);
 
-router.get('/instrument/:id/delete', instrumentController.getInstrumentDeleteForm);
 router.post('/instrument/:id/delete', instrumentController.postInstrumentDeleteForm);
 
 router.get('/instrument/:id/', instrumentController.getInstrumentDetails);
