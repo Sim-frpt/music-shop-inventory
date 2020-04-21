@@ -1,7 +1,8 @@
 <div class="container w-75 mt-5">
   <h1 class="mb-5 mx-auto">{{title}}</h1>
 
-  <form action="" method="POST" class="mx-auto mb-5">
+  <form enctype="multipart/form-data" action="" method="POST" class="mx-auto mb-5">
+
     <div class="form-group">
       <label for="instrument-name">Name</label>
       <input
@@ -12,6 +13,7 @@
         value="{{instrument.name}}"
         >
     </div>
+
       <div class="form-group">
         <label for="instrument-desc">Description</label>
         <textarea
@@ -19,6 +21,7 @@
           id="instrument-desc"
           name="description" cols="30" rows="10">{{instrument.description}}</textarea>
       </div>
+
       <div class="form-group">
         <label for="instrument-category">Category</label>
         <select
@@ -35,6 +38,7 @@
           {{/markAsSelected}}
         </select>
       </div>
+
       <div class="form-group">
         <label for="instrument-price">Price</label>
         <input
@@ -43,21 +47,31 @@
           id="instrument-price"
           class="form-control"
           name="price"
-          value="{{instrument.price}}"
-          >
+          value="{{instrument.price}}">
       </div>
-        <div class="form-group">
-          <label for="instrument-stock">Stock</label>
-          <input
-            type="number"
-            id="instrument-stock"
-            class="form-control"
-            name="stock"
-            value="{{instrument.stock}}"
-            placeholder="0"
-            >
-        </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
+
+      <div class="form-group">
+        <label for="instrument-stock">Stock</label>
+        <input
+          type="number"
+          id="instrument-stock"
+          class="form-control"
+          name="stock"
+          value="{{instrument.stock}}"
+          placeholder="0">
+      </div>
+
+      <div class="form-group">
+        <label for="instrument-picture">Picture</label>
+        <input
+          type="file"
+          id="instrument-picture"
+          class="form-control-file"
+          aria-describedby="fileHelp"
+          name="picture">
+        <small id="fileHelp" class="form-text text-muted">Only the following formats will be supported: JPEG/JPG/PNG</small>
+      </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
   </form>
   {{#if errors}}
     <div>

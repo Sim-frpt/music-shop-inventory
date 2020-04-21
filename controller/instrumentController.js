@@ -1,8 +1,15 @@
+const multer = require('multer');
+const path = require('path');
 const { validationResult } = require('express-validator');
-const validateInstrument = require('../helpers/validators/instrument');
-const db = require('../db/index');
+const multerConfig = require(path.resolve(__dirname, '../helpers/multer/config'));
+const validateInstrument = require(
+  path.resolve(__dirname, '../helpers/validators/instrument')
+);
+const db = require(path.resolve(__dirname, '../db/index'));
+const shortenDescription = require(path.resolve(__dirname, '../helpers/helpers'));
 const baseInstrumentUrl = '/inventory/instrument';
-const shortenDescription = require('../helpers/helpers');
+
+const pictureUpload = multer(multerConfig).single('picture');
 
 // GET base route
 exports.getIndex = (req, res, next) => {
@@ -41,6 +48,14 @@ exports.getInstrumentCreateForm = (req, res, next) => {
 
 // POST create form
 exports.postInstrumentCreateForm = [
+  (req, res, next) => {
+    pictureUpload(req, res, err => {
+      if (err) {
+        req.fileValidationError = err.message;
+      }
+      next();
+    })
+  },
   validateInstrument(),
   (req, res, next) => {
     const errors = validationResult(req);
@@ -48,6 +63,18 @@ exports.postInstrumentCreateForm = [
     const categoryQuery = {
       text: "SELECT * FROM category"
     };
+    const picture = req.file;
+    // TODO finish multer stuff
+    //if (req.file) {
+      //picture = req.file.filename;
+    //} else {
+      //picture = null;
+    //}
+
+    if ( req.fileValidationError ) {
+      // Weird naming, but it works to put multer errors in the same array as express-validator errors
+      errors.errors.push({ msg: req.fileValidationError });
+    }
 
     if (!errors.isEmpty()) {
       db.query(categoryQuery)
@@ -64,9 +91,10 @@ exports.postInstrumentCreateForm = [
         })
         .catch(err => next(err));
     } else {
+      console.log(picture);
       const insertInstrument = {
         text: "INSERT INTO instrument(name, description, category_id, price, stock) VALUES ($1, $2, $3, $4, $5) RETURNING instrument_id",
-        values: [ name, description, category_id, price, stock ]
+        values: [ name, description, category_id, price, stock]
       };
 
       db.query(insertInstrument)
