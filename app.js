@@ -6,6 +6,8 @@ const logger = require('morgan');
 const hbs = require('hbs');
 const hbsUtils = require('hbs-utils')(hbs);
 
+global.appRoot = path.resolve(__dirname);
+
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const inventoryRouter = require('./routes/inventory');

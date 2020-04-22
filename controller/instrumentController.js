@@ -1,12 +1,10 @@
 const multer = require('multer');
-const path = require('path');
+const fs = require('fs');
 const { validationResult } = require('express-validator');
-const multerConfig = require(path.resolve(__dirname, '../helpers/multer/config'));
-const validateInstrument = require(
-  path.resolve(__dirname, '../helpers/validators/instrument')
-);
-const db = require(path.resolve(__dirname, '../db/index'));
-const shortenDescription = require(path.resolve(__dirname, '../helpers/helpers'));
+const multerConfig = require('../helpers/multer/config');
+const validateInstrument = require('../helpers/validators/instrument')
+const db = require('../db/index');
+const shortenDescription = require('../helpers/helpers');
 const baseInstrumentUrl = '/inventory/instrument';
 
 const pictureUpload = multer(multerConfig).single('picture');
@@ -64,19 +62,24 @@ exports.postInstrumentCreateForm = [
       text: "SELECT * FROM category"
     };
     const picture = req.file;
-    // TODO finish multer stuff
-    //if (req.file) {
-      //picture = req.file.filename;
-    //} else {
-      //picture = null;
-    //}
 
     if ( req.fileValidationError ) {
       // Weird naming, but it works to put multer errors in the same array as express-validator errors
       errors.errors.push({ msg: req.fileValidationError });
     }
 
+    // If errors, rerender the form with all the entered info + errors
     if (!errors.isEmpty()) {
+
+      // if file was uploaded => delete it
+      if (picture) {
+        fs.unlink(global.appRoot + '/' + picture.path, err => {
+          if (err) {
+            next(err);
+          }
+        });
+      }
+
       db.query(categoryQuery)
         .then(result => {
           const categories = result.rows;
@@ -91,10 +94,11 @@ exports.postInstrumentCreateForm = [
         })
         .catch(err => next(err));
     } else {
-      console.log(picture);
+      //for DB insertion
+      const pictureName = picture ? picture.filename : null;
       const insertInstrument = {
-        text: "INSERT INTO instrument(name, description, category_id, price, stock) VALUES ($1, $2, $3, $4, $5) RETURNING instrument_id",
-        values: [ name, description, category_id, price, stock]
+        text: "INSERT INTO instrument(name, description, category_id, price, stock, picture) VALUES ($1, $2, $3, $4, $5, $6) RETURNING instrument_id",
+        values: [ name, description, category_id, price, stock, pictureName ]
       };
 
       db.query(insertInstrument)
