@@ -260,6 +260,18 @@ exports.postInstrumentDeleteForm = (req, res, next) => {
         return next(error);
       }
 
+      // Delete the insturment image from public/upload before deleting the
+      // record from the DB, but only if it's not the placeholder picture.
+      if (result.rows[0].picture !== placeholderPicture) {
+        fs.unlink(
+          global.appRoot + '/public/uploads/' + result.rows[0].picture,
+          err => {
+          if (err) {
+            next(err);
+          }
+        });
+      }
+
       db.query(deleteInstQuery)
         .then(res.redirect("/inventory/instruments"))
         .catch(err => next(err));
