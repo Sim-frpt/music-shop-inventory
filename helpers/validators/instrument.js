@@ -9,6 +9,7 @@ function validateInstrument() {
     .escape(),
     check('description')
     .isLength({ max: 2000 }).withMessage("Description must be shorter than 2000 characters")
+    .isAlphanumeric()
     .trim()
     .escape(),
     check('category_id')
@@ -24,6 +25,11 @@ function validateInstrument() {
     check('stock')
     .not().isEmpty().withMessage("Stock must not be empty")
     .isInt().withMessage("Stock must be a whole number")
+    .trim()
+    .escape(),
+    check('current_picture')
+    .optional()
+    .isLength({ max: 200 })
     .trim()
     .escape()
   ];

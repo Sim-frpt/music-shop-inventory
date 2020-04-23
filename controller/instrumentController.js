@@ -5,9 +5,11 @@ const multerConfig = require('../helpers/multer/config');
 const validateInstrument = require('../helpers/validators/instrument')
 const db = require('../db/index');
 const shortenDescription = require('../helpers/helpers');
-const baseInstrumentUrl = '/inventory/instrument';
 
+const baseInstrumentUrl = '/inventory/instrument';
+const placeholderPicture = "placeholder-instruments.jpg";
 const pictureUpload = multer(multerConfig).single('picture');
+const uploadFolder = "/uploads/";
 
 // GET base route
 exports.getIndex = (req, res, next) => {
@@ -70,10 +72,9 @@ exports.postInstrumentCreateForm = [
 
     // If errors, rerender the form with all the entered info + errors
     if (!errors.isEmpty()) {
-
       // if file was uploaded => delete it
       if (picture) {
-        fs.unlink(global.appRoot + '/' + picture.path, err => {
+        fs.unlink(picture.path, err => {
           if (err) {
             next(err);
           }
@@ -134,11 +135,20 @@ exports.getInstrumentUpdateForm = (req, res, next) => {
         return next(error);
       }
 
+      // If there was no picture in DB, make the picture be the placeholder one
+      let isPlaceholderPic = false;
+      if (!instrument[0].picture) {
+        instrument[0].picture = placeholderPicture
+        isPlaceholderPic = !isPlaceholderPic;
+      };
+
       res.render("instrument-form", {
         title: "Update Instrument",
         instrument: instrument[0],
         categories,
-        baseInstrumentUrl
+        baseInstrumentUrl,
+        uploadFolder,
+        isPlaceholderPic
       });
     })
     .catch(err => next(err));
@@ -146,34 +156,78 @@ exports.getInstrumentUpdateForm = (req, res, next) => {
 
 // POST update form
 exports.postInstrumentUpdateForm = [
+  (req, res, next) => {
+    // IMPORTANT :Multer throws an error if you enter a wrong file type.
+    // That means that the input type='file' must be the last input in the form,
+    // cause every following input will be voided by the error, 
+    // making it impossible to re-render them in the update form in 
+    // the error handling logic below.
+    pictureUpload(req, res, err => {
+      if (err) {
+        req.fileValidationError = err.message;
+      }
+      next();
+    })
+  },
   validateInstrument(),
   (req, res, next) => {
-
     const errors = validationResult(req);
     const { name, description, category_id, price, stock } = req.body;
     const categoryQuery = {
       text: "SELECT * FROM category"
     };
+    const picture = req.file;
+
+    if ( req.fileValidationError ) {
+      // Weird naming, but it works to put multer errors in the same array as express-validator errors
+      errors.errors.push({ msg: req.fileValidationError });
+    }
 
     if (!errors.isEmpty()) {
+      // if file was uploaded => delete it
+      if (picture) {
+        fs.unlink(picture.path, err => {
+          if (err) {
+            next(err);
+          }
+        });
+      }
+
       return db.query(categoryQuery)
         .then(result => {
           const categories = result.rows;
+
+          // If there was an error and no file was uploaded, return picture to be the last that was successfully associated with the instrument
+          req.body.picture = req.body.last_successfully_saved_pic;
 
           return res.render("instrument-form", {
             title: "Update instrument",
             instrument: req.body,
             baseInstrumentUrl,
             categories,
+            uploadFolder,
             errors: errors.array({ onlyFirstError: true })
           });
         })
         .catch(err => next(err));
     }
 
+    //for DB insertion => If a new picture has been successfully validated, delete the old picture, but only if it's not the placeholder picture.
+    if (picture && req.body.last_successfully_saved_pic !== placeholderPicture) {
+        fs.unlink(
+          global.appRoot + '/public/uploads/' + req.body.last_successfully_saved_pic,
+          err => {
+          if (err) {
+            next(err);
+          }
+        });
+    }
+
+    const pictureName = picture ? picture.filename :
+      req.body.last_successfully_saved_pic;
     const insertQuery = {
-      text: "UPDATE instrument SET name = $1, description = $2, category_id = $3, price = $4, stock = $5 WHERE instrument_id = $6 RETURNING instrument_id",
-      values: [ name, description, category_id, price, stock, req.params.id ]
+      text: "UPDATE instrument SET name = $1, description = $2, category_id = $3, price = $4, stock = $5, picture = $6 WHERE instrument_id = $7 RETURNING instrument_id",
+      values: [ name, description, category_id, price, stock, pictureName, req.params.id ]
     };
 
     db.query(insertQuery)
@@ -216,7 +270,7 @@ exports.postInstrumentDeleteForm = (req, res, next) => {
 // GET instrument details
 exports.getInstrumentDetails = (req, res, next) => {
   const query = {
-    text: "SELECT instrument_id, i.name, description, price, stock, c.name as category, c.category_id FROM instrument i LEFT JOIN category c ON i.category_id = c.category_id WHERE instrument_id = $1",
+    text: "SELECT instrument_id, i.name, description, price, stock, picture, c.name as category, c.category_id FROM instrument i LEFT JOIN category c ON i.category_id = c.category_id WHERE instrument_id = $1",
     values: [ req.params.id ]
   };
 
@@ -229,10 +283,17 @@ exports.getInstrumentDetails = (req, res, next) => {
         return next(error);
       }
 
+      const instrument = result.rows[0];
+
+      if (!instrument.picture) {
+        instrument.picture = placeholderPicture
+      }
+
       res.render("instrument-details", {
         title: "Instrument Details",
         instrument: result.rows[0],
-        baseInstrumentUrl
+        baseInstrumentUrl,
+        uploadFolder
       });
     })
     .catch(err => next(err));

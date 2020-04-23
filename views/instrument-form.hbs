@@ -2,6 +2,12 @@
   <h1 class="mb-5 mx-auto">{{title}}</h1>
 
   <form enctype="multipart/form-data" action="" method="POST" class="mx-auto mb-5">
+    {{#if instrument.picture}}
+    <div class="form-group">
+      {{!-- This hidden field is to pass the current picture filename to the server if there is one  --}}
+      <input type="hidden" value="{{instrument.picture}}" name="last_successfully_saved_pic">
+    </div>
+    {{/if}}
 
     <div class="form-group">
       <label for="instrument-name">Name</label>
@@ -71,16 +77,29 @@
           name="picture">
         <small id="fileHelp" class="form-text text-muted">Only the following formats will be supported: JPEG/JPG/PNG</small>
       </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+
+      {{#if instrument.picture}}
+      <div class="instrument-form-picture-wrapper mb-3">
+        <p>
+          {{#if isPlaceholderPic}}
+          <small>Default picture:</small>
+          {{else}}
+          <small>Current picture:</small>
+          {{/if}}
+        </p>
+        <img class="img-fluid instrument-form-picture" src="{{uploadFolder}}{{instrument.picture}}" alt="Instrument image">
+      </div>
+      {{/if}}
+      <button type="submit" class="btn btn-primary">Submit</button>
   </form>
   {{#if errors}}
-    <div>
-      {{#each errors}}
-        <div class="alert alert-dismissible alert-warning">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <span>{{this.msg}}</span>
-        </div>
-      {{/each}}
+  <div>
+    {{#each errors}}
+    <div class="alert alert-dismissible alert-warning">
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+      <span>{{this.msg}}</span>
     </div>
+    {{/each}}
+  </div>
   {{/if}}
 </div>
