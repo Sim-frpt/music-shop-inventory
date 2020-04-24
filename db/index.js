@@ -1,14 +1,19 @@
 const { Pool } = require('pg');
 const debug = require('debug')("music-shop-inventory:Node-Postgres");
 
-const config = {
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_DATABASE,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT
-};
-
+if (process.env.NODE_ENV === 'production') {
+  config = {
+    connectionString: process.env.DATABASE_URL
+  }
+} else {
+  config = {
+    user: process.env.DB_USER,
+    host: process.env.DB_HOST,
+    database: process.env.DB_DATABASE,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT
+  };
+}
 const pool = new Pool(config);
 
 pool
