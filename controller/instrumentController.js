@@ -2,12 +2,12 @@ const multer = require('multer');
 const fs = require('fs');
 const { validationResult } = require('express-validator');
 
-const db = require('../db/index');
 const instrumentModel  = require('../db/instrument');
 const categoryModel = require('../db/category');
 
 const multerConfig = require('../helpers/multer/config');
 const pictureUpload = multer(multerConfig).single('picture');
+
 const validateInstrument = require('../services/instrument/validation')
 const shortenDescription = require('../helpers/helpers');
 
