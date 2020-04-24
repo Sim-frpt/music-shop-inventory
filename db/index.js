@@ -1,7 +1,5 @@
 const { Pool } = require('pg');
 
-//const connectionString = "postgresql://sim:simon@localhost:5432/music_shop_inventory";
-
 const config = {
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -10,7 +8,6 @@ const config = {
   port: process.env.DB_PORT
 };
 
-//const pool = new pool(connectionString);
 const pool = new Pool(config);
 
 pool

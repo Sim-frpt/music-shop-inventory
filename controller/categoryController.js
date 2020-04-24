@@ -1,7 +1,7 @@
 const { validationResult } = require('express-validator');
 const db = require('../db/index');
 const baseCategoryUrl = "/inventory/category";
-const validateCategory = require('../helpers/validators/category');
+const validateCategory = require('../services/category/validation');
 
 // GET create form
 exports.getCategoryCreateForm = (req, res) => {
