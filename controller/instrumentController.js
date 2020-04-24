@@ -117,25 +117,28 @@ exports.getInstrumentUpdateForm = (req, res, next) => {
   ])
     .then(results => {
       const categories = results[0].rows;
-      const instrument = results[1].rows;
+      const instrument = results[1].rows[0];
 
-      if (!instrument.length) {
+      if (!instrument) {
         const error = new Error("Instrument not found");
         error.status = 404;
 
         return next(error);
       }
 
-      // If there was no picture in DB, make the picture be the placeholder one
       let isPlaceholderPic = false;
-      if (!instrument[0].picture) {
-        instrument[0].picture = placeholderPicture
-        isPlaceholderPic = !isPlaceholderPic;
-      };
+      // Check if the picture field corresponds to a file in the uploads folder.
+      // If it does not, use the placeholder picture.
+      fs.access(global.appRoot + '/public/uploads/' + instrument.picture, err => {
+        if (err) {
+          instrument.picture = placeholderPicture;
+          isPlaceholderPic = !isPlaceholderPic;
+        }
+      });
 
       res.render("instrument-form", {
         title: "Update Instrument",
-        instrument: instrument[0],
+        instrument,
         categories,
         baseInstrumentUrl,
         uploadFolder,
@@ -270,9 +273,13 @@ exports.getInstrumentDetails = (req, res, next) => {
 
       const instrument = result.rows[0];
 
-      if (!instrument.picture) {
-        instrument.picture = placeholderPicture
-      }
+      // Check if the picture field corresponds to a file in the uploads folder.
+      // If it does not, use the placeholder picture.
+      fs.access(global.appRoot + '/public/uploads/' + instrument.picture, err => {
+        if (err) {
+          instrument.picture = placeholderPicture;
+        }
+      });
 
       res.render("instrument-details", {
         title: "Instrument Details",
