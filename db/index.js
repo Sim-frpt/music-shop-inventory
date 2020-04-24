@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const debug = require('debug')("music-shop-inventory:Node-Postgres");
 
 const config = {
   user: process.env.DB_USER,
@@ -12,8 +13,8 @@ const pool = new Pool(config);
 
 pool
   .connect()
-  .then(() => console.log(`Connected to ${config.database} db`))
-  .catch(err => console.error("connection error", err.stack));
+  .then(() => debug(`Connected to ${config.database} db`))
+  .catch(err => debug("connection error", err.stack));
 
 module.exports = {
   query: (text, params) => {
