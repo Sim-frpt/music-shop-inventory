@@ -13,6 +13,15 @@ exports.getInstrument = id => {
   return db.query(query);
 };
 
+exports.getInstrumentByCategory = id => {
+  const query = {
+    text: "SELECT instrument_id, name FROM instrument WHERE category_id = $1 ORDER BY name ASC",
+    values: id
+  };
+
+  return db.query(query);
+};
+
 exports.getInstrumentDetails = id => {
   const query = {
     text: "SELECT instrument_id, i.name, description, price, stock, picture, c.name as category, c.category_id FROM instrument i LEFT JOIN category c ON i.category_id = c.category_id WHERE instrument_id = $1",

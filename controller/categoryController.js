@@ -1,5 +1,8 @@
 const { validationResult } = require('express-validator');
-const db = require('../db/index');
+
+const categoryModel = require('../db/category');
+const instrumentModel = require('../db/instrument');
+
 const baseCategoryUrl = "/inventory/category";
 const validateCategory = require('../services/category/validation');
 
@@ -23,23 +26,18 @@ exports.postCategoryCreateForm = [
       });
     }
 
-    const existingCatQuery = {
-      text: "SELECT category_id FROM category WHERE name = $1",
-      values: [ req.body.name ]
-    };
-
-    const createCatQuery = {
-      text: "INSERT INTO category(name) VALUES($1) RETURNING category_id",
-      values: [ req.body.name ]
-    };
-
-    db.query(existingCatQuery)
+    categoryModel.getCategory( "name", [ req.body.name ])
       .then(result => {
         if (result.rows.length > 0) {
-          return res.redirect(baseCategoryUrl + "/" + result.rows[0].category_id);
+
+          return res.render("category-form", {
+            title: "Create Category",
+            catInput: req.body.name,
+            errors: [ { msg: "Another category by that name already exists" } ]
+          });
         }
 
-        db.query(createCatQuery)
+        categoryModel.createCategory([ req.body.name ])
           .then(result => {
             return res.redirect(baseCategoryUrl + "/" + result.rows[0].category_id);
           })
@@ -51,12 +49,7 @@ exports.postCategoryCreateForm = [
 
 // GET update form
 exports.getCategoryUpdateForm = (req, res, next) => {
-  const query = {
-    text: "SELECT * FROM category WHERE category_id = $1",
-    values: [ req.params.id ]
-  };
-
-  db.query(query)
+  categoryModel.getCategory( "category_id", [ req.params.id ] )
     .then(result => {
       if (!result.rows.length) {
         const error = new Error("Category not found");
@@ -88,17 +81,12 @@ exports.postCategoryUpdateForm = [
       });
     }
 
-    const verifyNameQuery = {
-      text: "SELECT * FROM category WHERE name = $1 AND category_id != $2",
-      values: [ req.body.name, req.params.id ]
-    }
-
-    const updateNameQuery = {
-      text: "UPDATE category SET name = $1 WHERE category_id = $2 RETURNING category_id",
-      values: [ req.body.name, req.params.id ]
-    };
-
-    db.query(verifyNameQuery)
+    // Prevents updating the category with the same name as a category that
+    // already exists, except if it's the category we're currently updating.
+    categoryModel.getCategoryWithSameNameDifferentId( [
+      req.body.name,
+      req.params.id
+    ])
       .then(result => {
 
         if (result.rows.length) {
@@ -113,7 +101,7 @@ exports.postCategoryUpdateForm = [
           });
         }
 
-        db.query(updateNameQuery)
+        categoryModel.updateCategory([ req.body.name, req.params.id ])
           .then(result => {
             return res.redirect(baseCategoryUrl + "/" + result.rows[0].category_id);
           })
@@ -125,24 +113,17 @@ exports.postCategoryUpdateForm = [
 
 // POST delete form
 exports.postCategoryDeleteForm = (req, res, next) => {
-  const searchCatQuery = {
-    text: "SELECT * FROM category WHERE category_id = $1",
-    values: [ req.body.category_id ]
-  }
-
-  const deleteCatQuery = {
-    text: "DELETE FROM category WHERE category_id = $1",
-    values: [ req.body.category_id ]
-  };
-
-  db.query(searchCatQuery)
+  categoryModel.getCategory('category_id', [ req.body.category_id ])
     .then(result => {
 
       if (!result.rows.length) {
-        return res.redirect('/inventory/categories');
+        const error = new Error("Category not found");
+        error.status = 404;
+
+        return next(error);
       }
 
-      db.query(deleteCatQuery)
+      categoryModel.deleteCategory([ req.body.category_id ])
         .then(res.redirect('/inventory/categories'))
         .catch(err => next(err));
     })
@@ -151,17 +132,10 @@ exports.postCategoryDeleteForm = (req, res, next) => {
 
 // GET category details
 exports.getCategoryDetails = (req, res, next) => {
-  const categoryQuery = {
-    text: "SELECT * from category WHERE category_id = $1",
-    values: [ req.params.id ]
-  };
-
-  const instrumentsQuery = {
-    text: "SELECT instrument_id, name FROM instrument WHERE category_id = $1 ORDER BY name ASC",
-    values: [ req.params. id ]
-  };
-
-  Promise.all([ db.query(categoryQuery), db.query(instrumentsQuery) ])
+  Promise.all([
+    categoryModel.getCategory('category_id', [ req.params.id ]),
+    instrumentModel.getInstrumentByCategory([ req.params.id ])
+  ])
     .then(results => {
       const category = results[0].rows[0];
       const instruments = results[1].rows;
@@ -186,7 +160,7 @@ exports.getCategoryDetails = (req, res, next) => {
 
 // GET categories list
 exports.getCategoriesList = (req, res, next) => {
-  db.query("SELECT * FROM category ORDER BY name ASC")
+  categoryModel.getCategoriesList()
     .then(result => {
       res.render('categories', {
         title: "Categories List",
