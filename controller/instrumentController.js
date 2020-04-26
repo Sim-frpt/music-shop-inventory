@@ -276,7 +276,7 @@ exports.getInstrumentDetails = (req, res, next) => {
 
       // Check if the picture field corresponds to a file in the uploads folder.
       // If it does not, use the placeholder picture.
-      fs.access(appRoot + '/public/uploads' + instrument.picture, err => {
+      fs.access(appRoot + '/public/uploads/' + instrument.picture, err => {
         if (err) {
           instrument.picture = placeholderPicture;
         }
