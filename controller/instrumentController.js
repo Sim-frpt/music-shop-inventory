@@ -127,22 +127,23 @@ exports.getInstrumentUpdateForm = (req, res, next) => {
       }
 
       let isPlaceholderPic = false;
+
       // Check if the picture field corresponds to a file in the uploads folder.
       // If it does not, use the placeholder picture.
-      fs.access(global.appRoot + '/public/uploads/' + instrument.picture, err => {
+      fs.access(appRoot + '/public/uploads/' + instrument.picture, err => {
         if (err) {
           instrument.picture = placeholderPicture;
           isPlaceholderPic = !isPlaceholderPic;
         }
-      });
 
-      res.render("instrument-form", {
-        title: "Update Instrument",
-        instrument,
-        categories,
-        baseInstrumentUrl,
-        uploadFolder,
-        isPlaceholderPic
+        res.render("instrument-form", {
+          title: "Update Instrument",
+          instrument,
+          categories,
+          baseInstrumentUrl,
+          uploadFolder,
+          isPlaceholderPic
+        });
       });
     })
     .catch(err => next(err));
@@ -275,17 +276,17 @@ exports.getInstrumentDetails = (req, res, next) => {
 
       // Check if the picture field corresponds to a file in the uploads folder.
       // If it does not, use the placeholder picture.
-      fs.access(global.appRoot + '/public/uploads/' + instrument.picture, err => {
+      fs.access(appRoot + '/public/uploads' + instrument.picture, err => {
         if (err) {
           instrument.picture = placeholderPicture;
         }
-      });
 
-      res.render("instrument-details", {
-        title: "Instrument Details",
-        instrument: result.rows[0],
-        baseInstrumentUrl,
-        uploadFolder
+        res.render("instrument-details", {
+          title: "Instrument Details",
+          instrument: result.rows[0],
+          baseInstrumentUrl,
+          uploadFolder
+        });
       });
     })
     .catch(err => next(err));
